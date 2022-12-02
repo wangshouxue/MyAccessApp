@@ -21,18 +21,16 @@ object AccessibilityUtil {
     fun scrollByNode(
         service: AccessibilityService,
         nodeInfo: AccessibilityNodeInfo,
-        distanceX: Int = 0,
-        distanceY: Int = 0
     ): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val rect = Rect()
             nodeInfo.getBoundsInScreen(rect)
-            val point = Point((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2)
+            val point = Point((rect.left + rect.right) / 2, (rect.top + rect.bottom) /3*2)
             val builder = GestureDescription.Builder()
             val path = Path()
             path.moveTo(point.x.toFloat(), point.y.toFloat())
-            path.lineTo(point.x.toFloat() + distanceX, point.y.toFloat() + distanceY)
-            builder.addStroke(GestureDescription.StrokeDescription(path, 0L, 300L))
+            path.lineTo(point.x.toFloat(), 100f)
+            builder.addStroke(GestureDescription.StrokeDescription(path, 0L, 500L))
             val gesture = builder.build()
             return service.dispatchGesture(gesture, object : AccessibilityService.GestureResultCallback() {
                 override fun onCompleted(gestureDescription: GestureDescription) {
