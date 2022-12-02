@@ -30,7 +30,7 @@ public class AccessService extends AccessibilityService {
 //    private static final String appPackageName = "com.kuaishou.nebula";
     public static AccessService mService;
     private AccessibilityNodeInfo nodeInfo;
-    private int[] times=new int[]{5,10,15,20,25,30};
+    private int[] times=new int[]{3,5,8,10,13,15,17,20};
     Random random=new Random();
     long startTime;
 
@@ -84,7 +84,6 @@ public class AccessService extends AccessibilityService {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
 //                Log.i("====Accessibility", className);
                 try {
-
                     if (className.equals("com.example.myaccessapp.MainActivity")) {
                         List<AccessibilityNodeInfo> list = rootNodeInfo.findAccessibilityNodeInfosByViewId("com.example.myaccessapp:id/tv");
                         list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
@@ -99,6 +98,7 @@ public class AccessService extends AccessibilityService {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+
 //                if (className.equals("com.yxcorp.gifshow.detail.PhotoDetailActivity")) {//个人作品页点击进入的播放
 //                    //自弹出分享
 ////                    List<AccessibilityNodeInfo> list=rootNodeInfo.findAccessibilityNodeInfosByViewId("com.kuaishou.nebula:id/forward_button");//分享
@@ -119,6 +119,11 @@ public class AccessService extends AccessibilityService {
                 break;
             case AccessibilityEvent.TYPE_VIEW_SCROLLED:
 //                Log.i("====scroll",  className);
+//                List<AccessibilityNodeInfo> list=rootNodeInfo.findAccessibilityNodeInfosByViewId("com.kuaishou.nebula:id/layout_root_hot_live_play");
+//                for (int i=0;i<list.size();i++){
+//                    AccessibilityNodeInfo info=list.get(i);
+//                    Log.i("====scroll"+i,  info.getParent()+"--"+info.getParent().getParent());
+//                }
                 break;
             default:
                 break;
