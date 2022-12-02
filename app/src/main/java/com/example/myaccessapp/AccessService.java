@@ -25,14 +25,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Description: 具体的无障碍处理逻辑
+ * 授权后自动打开目标应用，刷一段时间后关闭目标应用休息，休息一段时间后再次打开目标应用刷
  */
 public class AccessService extends AccessibilityService {
 //    private static final String appPackageName = "com.kuaishou.nebula";
     public static AccessService mService;
     private AccessibilityNodeInfo nodeInfo;
-    private int[] times=new int[]{3,5,8,10,13,15,17,20};
+    private int[] allTimes=new int[]{5,10,20,30,40,50,60,2*60};//连续刷的总时长(最多2h) 分-时
+    private int[] times=new int[]{3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};//每个视频停留的时长(最多20s)-秒
+    private int[] restTimes=new int[]{1*60,2*60,3*60,4*60,5*60,6*60,7*60,8*60,9*60,10*60};//休息的时长(最多10min)-分
     Random random=new Random();
     long startTime;
+    int allTime;
+    boolean needOpen=true;//控制休息时不触发自动打开目标应用
 
     private Handler handler=new Handler(){
         @Override
@@ -42,23 +47,26 @@ public class AccessService extends AccessibilityService {
                 case 0:
                     try {
                         AccessibilityUtil.INSTANCE.scrollByNode(mService,nodeInfo,0,-800);
-                        int index=random.nextInt(times.length);
-                        if (System.currentTimeMillis()-startTime>5*60*60*1000){//大于5h退出应用
+                        if (System.currentTimeMillis()-startTime> allTime*60*1000){//大于5h退出应用
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+                            needOpen=false;
+                            handler.sendEmptyMessageDelayed(1,restTimes[random.nextInt(restTimes.length)]*1000);
                         } else{
+                            int index=random.nextInt(times.length);
                             handler.sendEmptyMessageDelayed(0,times[index]*1000);
                         }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
                     break;
-//                case 1:
-//                    Intent intent =new Intent();
-//                    intent.setPackage("com.example.myaccessapp");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//                    break;
+                case 1:
+                    needOpen=true;
+                    Intent intent =new Intent();
+                    intent.setPackage("com.kuaishou.nebula");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    break;
             }
         }
     };
@@ -78,18 +86,40 @@ public class AccessService extends AccessibilityService {
 
         AccessibilityNodeInfo rootNodeInfo = getRootInActiveWindow();
         int eventType = event.getEventType();
+//        if (event.getPackageName()==null){
+//            return;
+//        }
+        if (event.getClassName()==null){
+            return;
+        }
+//        String packageName=event.getPackageName().toString();
         String className = event.getClassName().toString();
 
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
 //                Log.i("====Accessibility", className);
                 try {
-                    if (className.equals("com.example.myaccessapp.MainActivity")) {
+                    if (className.equals("com.android.settings.SubSettings")){
+                        performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+                        performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+                        return;
+                    }
+                    if (className.equals("com.android.settings.accessibility.MiuiAccessibilitySettingsActivity")){
+                        performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+                        return;
+                    }
+                    if (className.equals("com.example.myaccessapp.MainActivity")) {//点击按钮打开应用
                         List<AccessibilityNodeInfo> list = rootNodeInfo.findAccessibilityNodeInfosByViewId("com.example.myaccessapp:id/tv");
                         list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         return;
                     }
+                     if (needOpen&&className.equals("com.android.internal.app.ResolverActivity")){//选择弹窗中选择一个打开
+                         List<AccessibilityNodeInfo> list =rootNodeInfo.findAccessibilityNodeInfosByText("快手极速版");
+                         list.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                         return;
+                     }
                     if (className.equals("com.yxcorp.gifshow.HomeActivity")) {
+                        allTime=allTimes[random.nextInt(allTimes.length)];
                         List<AccessibilityNodeInfo> list = rootNodeInfo.findAccessibilityNodeInfosByViewId("com.kuaishou.nebula:id/nasa_groot_view_pager");
                         nodeInfo = list.get(0);
                         startTime=System.currentTimeMillis();

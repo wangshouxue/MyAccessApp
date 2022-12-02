@@ -9,7 +9,7 @@
     android:canRequestFilterKeyEvents="true"
     android:canRequestEnhancedWebAccessibility="true"
     android:notificationTimeout="600"
-    android:packageNames="com.example.myaccessapp,com.kuaishou.nebula"
     android:settingsActivity="com.example.myaccessapp.AccessService"
     />
 
+<!--    android:packageNames="com.example.myaccessapp,com.kuaishou.nebula"-->
