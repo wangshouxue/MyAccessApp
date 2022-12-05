@@ -31,8 +31,8 @@ public class AccessService extends AccessibilityService {
 //    private static final String appPackageName = "com.kuaishou.nebula";
     public static AccessService mService;
     private AccessibilityNodeInfo nodeInfo;
-    private int[] allTimes=new int[]{5,10,20,30,40,50,60,2*60,3*60};//连续刷的总时长(最多3h) 分-时
-    private int[] times=new int[]{5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,35,40};//每个视频停留的时长(最多20s)-秒
+    private int[] allTimes=new int[]{1,2,3,4,5};//连续刷的总时长(最多5h) 时
+    private int[] times=new int[]{10,11,12,13,14,15,16,17,18,19,20,25,30,35,40};//每个视频停留的时长(最多20s)-秒
     private int[] restTimes=new int[]{1*60,2*60,3*60,4*60,5*60,6*60,7*60,8*60,9*60,10*60};//休息的时长(最多10min)-分
     Random random=new Random();
     long startTime;
@@ -47,7 +47,7 @@ public class AccessService extends AccessibilityService {
                 case 0:
                     try {
                         AccessibilityUtil.INSTANCE.scrollByNode(mService,nodeInfo);
-                        if (System.currentTimeMillis()-startTime> allTime*60*1000){//大于5h退出应用
+                        if (System.currentTimeMillis()-startTime> allTime*60*60*1000){//大于5h退出应用
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
                             needOpen=false;
