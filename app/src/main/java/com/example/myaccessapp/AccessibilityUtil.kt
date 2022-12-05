@@ -21,6 +21,7 @@ object AccessibilityUtil {
     fun scrollByNode(
         service: AccessibilityService,
         nodeInfo: AccessibilityNodeInfo,
+        scrollMore:Boolean
     ): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val rect = Rect()
@@ -29,7 +30,11 @@ object AccessibilityUtil {
             val builder = GestureDescription.Builder()
             val path = Path()
             path.moveTo(point.x.toFloat(), point.y.toFloat())
-            path.lineTo(point.x.toFloat(), 100f)
+            if (scrollMore){
+                path.lineTo(point.x.toFloat(), 100f)
+            }else{
+                path.lineTo(point.x.toFloat(), (rect.top + rect.bottom).toFloat())
+            }
             builder.addStroke(GestureDescription.StrokeDescription(path, 0L, 500L))
             val gesture = builder.build()
             return service.dispatchGesture(gesture, object : AccessibilityService.GestureResultCallback() {

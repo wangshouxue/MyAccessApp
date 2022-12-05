@@ -46,7 +46,7 @@ public class AccessService extends AccessibilityService {
             switch (msg.what){
                 case 0:
                     try {
-                        AccessibilityUtil.INSTANCE.scrollByNode(mService,nodeInfo);
+                        AccessibilityUtil.INSTANCE.scrollByNode(mService,nodeInfo,true);
                         if (System.currentTimeMillis()-startTime> allTime*60*60*1000){//大于5h退出应用
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
                             performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
